@@ -1,0 +1,40 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Inicio
+{% endblock title %}
+
+{% block content_title %}
+   ¡Encuentra las mejores autopartes aquí!
+{% endblock content_title %}
+
+{% block content %}
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">Categoría: {{ product.category.name }}</small><br>
+                                    <small class="text-muted">Subcategoría: {{ product.subcategory.name }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <h4 class="text-success mb-0">${{ product.price }}</h4>
+                                    <small class="text-muted">Stock: {{ product.stock }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No hay productos registrados.
+        </div>
+    {% endif %}
+{% endblock content %}

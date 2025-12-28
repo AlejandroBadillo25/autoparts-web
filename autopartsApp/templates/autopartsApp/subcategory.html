@@ -1,0 +1,56 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Subcategorías
+{% endblock title %}
+
+{% block content_title %}
+    Lista de subcategorías
+{% endblock content_title %}
+
+{% block content %}
+    <a href="{% url 'autopartsApp:subcategory_create' %}" class="btn btn-primary mb-3">Crear nueva subcategoría</a>
+    
+    <form action="{% url 'autopartsApp:subcategory' %}" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar subcategoría..." class="form-control">
+            <button type="submit" class="btn btn-secondary">Buscar</button>
+            {% if busqueda %}
+                <a href="{% url 'autopartsApp:subcategory' %}" class="btn btn-outline-secondary">Limpiar</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if busqueda %}
+        <div class="alert alert-info">
+            Mostrando resultados para: <strong>"{{ busqueda }}"</strong> ({{ subcategories.count }} resultado{{ subcategories.count|pluralize }})
+        </div>
+    {% endif %}
+
+    {% if subcategories %}
+        <ul class="list-group shadow">
+            {% for subcat in subcategories %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold">{{ subcat.name }}</span>
+                        <p class="mb-0 text-muted">
+                            <small>Categoría: {{ subcat.category.name }}</small><br>
+                            {{ subcat.description|truncatewords:15 }}
+                        </p>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ subcat.created_at|date:"d/m/Y" }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% if busqueda %}
+            <div class="alert alert-warning">
+                No se encontraron subcategorías que coincidan con "{{ busqueda }}". <a href="{% url 'autopartsApp:subcategory' %}">Ver todas</a>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No hay subcategorías registradas. <a href="{% url 'autopartsApp:subcategory_create' %}">Crea una nueva subcategoría</a>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock content %}
