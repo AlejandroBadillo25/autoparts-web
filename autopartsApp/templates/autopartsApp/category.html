@@ -1,0 +1,53 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Categorías
+{% endblock title %}
+
+{% block content_title %}
+    Lista de categorías
+{% endblock content_title %}
+
+{% block content %}
+    <a href="{% url 'autopartsApp:category_create' %}" class="btn btn-primary mb-3">Crear nueva categoría</a>
+    
+    <form action="{% url 'autopartsApp:category' %}" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar categoría..." class="form-control">
+            <button type="submit" class="btn btn-secondary">Buscar</button>
+            {% if busqueda %}
+                <a href="{% url 'autopartsApp:category' %}" class="btn btn-outline-secondary">Limpiar</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if busqueda %}
+        <div class="alert alert-info">
+            Mostrando resultados para: <strong>"{{ busqueda }}"</strong> ({{ categories.count }} resultado{{ categories.count|pluralize }})
+        </div>
+    {% endif %}
+
+    {% if categories %}
+        <ul class="list-group shadow">
+            {% for cat in categories %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold">{{ cat.name }}</span>
+                        <p class="mb-0 text-muted">{{ cat.description|truncatewords:15 }}</p>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ cat.created_at|date:"d/m/Y" }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% if busqueda %}
+            <div class="alert alert-warning">
+                No se encontraron categorías que coincidan con "{{ busqueda }}". <a href="{% url 'autopartsApp:category' %}">Ver todas</a>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No hay categorías registradas. <a href="{% url 'autopartsApp:category_create' %}">Crea una nueva categoría</a>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock content %}
