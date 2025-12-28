@@ -1,28 +1,122 @@
 # autoparts-web
 
-Consigna
-Crea una web en Django utilizando Herencia de plantillas, con un modelo de por lo menos 3 clases, un formulario para ingresar datos a las 3 clases y un formulario para buscar algo en la BD, no hace falta que sea sobre las tres clases, con realizar búsqueda sobre una alcanzará.
+Proyecto desarrollado en Python y Django para administrar la web de una refaccionaria. El sistema permite gestionar categorías, subcategorías y productos de autopartes con funcionalidades completas de creación, listado y búsqueda.
 
-Te sugerimos que hagas  una web estilo blog para ir preparando en la entrega final.
+## **Descripción**
 
-Objetivos
-Desarrollar tu primer WEB en Django utilizando patrón MVT
+Este proyecto incluye:
+- Herencia de templates para mantener una estructura consistente
+- Formularios de creación para categorías, subcategorías y productos
+- Sistema de búsqueda en tiempo real con filtrado
+- Panel de administración de Django
+- Interfaz responsive con Bootstrap 5
+- Base de datos SQLite
 
-Requisitos
-Link de GitHub con el proyecto totalmente subido a la plataforma.
+## **Tecnologías utilizadas**
 
-Proyecto Web Django con patrón MVT que incluya:
-Herencia de HTML.
+- Python 3.11
+- Django
+- Bootstrap 5
+- SQLite
 
-Por lo menos 3 clases en models.
+## **Estructura de datos**
 
-Un formulario para insertar datos a por cada model creado..
+El proyecto cuenta con tres modelos principales:
 
-Un formulario para buscar algo en la BD
+**Category (Categorías)**: Permite organizar los productos en categorías principales (ej. Motor, Frenos, Suspensión).
 
-Readme que indique el orden en el que se prueban las cosas y/o donde están las funcionalidades.
+**Subcategory (Subcategorías)**: Clasificaciones más específicas dentro de cada categoría.
 
+**Products (Productos)**: Información completa de autopartes incluyendo nombre, descripción, precio, stock y relación con categoría y subcategoría.
 
-Formato
-Link al repositorio de GitHub con el nombre “TuPrimeraPagina+Apellido”  por ejemplo “TuPrimeraPagina+Fernandez”
+## **Características principales**
+
+- Listado completo de categorías, subcategorías y productos
+- Creación de nuevos registros mediante formularios validados
+- Búsqueda por nombre con filtrado instantáneo
+- Interfaz intuitiva y responsive
+- Panel de administración para gestión avanzada
+
+## **Requisitos previos**
+
+- Python 3.11 o superior instalado
+- Git instalado
+
+## **Pasos para utilizar el proyecto**
+
+**1. Clonar el repositorio de Github**
+
+```bash
+git clone https://github.com/AlejandroBadillo25/autoparts-web.git
+cd autoparts-web
+```
+
+**2. Crear un entorno virtual**
+
+En **macOS/Linux**:
+```bash
+python -m venv .venv
+```
+
+En **Windows**:
+```bash
+python -m venv .venv
+```
+
+**3. Activar el entorno virtual**
+
+En **macOS/Linux**:
+```bash
+source .venv/bin/activate
+```
+
+En **Windows (CMD)**:
+```bash
+.venv\Scripts\activate.bat
+```
+
+En **Windows (PowerShell)**:
+```bash
+.venv\Scripts\Activate.ps1
+```
+
+**4. Instalar las dependencias**
+
+```bash
+pip install -r requirements.txt
+```
+
+**5. Ejecutar las migraciones**
+
+```bash
+python manage.py migrate
+```
+
+**6. Crear un superusuario (opcional, para acceder al panel de administración)**
+
+```bash
+python manage.py createsuperuser
+```
+
+**7. Ejecutar el servidor de desarrollo**
+
+```bash
+python manage.py runserver
+```
+
+**8. Acceder a la aplicación**
+
+Abrir el navegador en: `http://127.0.0.1:8000/`
+
+Panel de administración: `http://127.0.0.1:8000/admin/`
+
+## **Rutas principales**
+
+- `/` - Página de inicio con listado de productos
+- `/category/` - Listado de categorías
+- `/category/create/` - Crear nueva categoría
+- `/subcategory/` - Listado de subcategorías
+- `/subcategory/create/` - Crear nueva subcategoría
+- `/products/` - Listado de productos
+- `/products/create/` - Crear nuevo producto
 
