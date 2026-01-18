@@ -1,0 +1,120 @@
+{% extends "autopartsApp/base.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block content_title %}{% endblock content_title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <!-- Header Section -->
+                <div class="text-center mb-5">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 100px; height: 100px; font-size: 3rem;">
+                        👨‍💻
+                    </div>
+                    <h2 class="fw-bold">{{ name }}</h2>
+                    <p class="text-muted">Data Analyst</p>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="row g-4">
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-3 me-3">
+                                <span style="font-size: 1.5rem;">📧</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Correo Electrónico</small>
+                                <a href="mailto:{{ email }}" class="text-decoration-none">{{ email }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-3 me-3">
+                                <span style="font-size: 1.5rem;">📱</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Teléfono</small>
+                                <a href="tel:{{ phone }}" class="text-decoration-none">{{ phone }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-3 me-3">
+                                <span style="font-size: 1.5rem;">📍</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Ubicación</small>
+                                <span>{{ location }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LinkedIn -->
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-3 me-3">
+                                <span style="font-size: 1.5rem;">💼</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">LinkedIn</small>
+                                <a href="https://{{ linkedin }}" target="_blank" class="text-decoration-none">
+                                    Ver perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GitHub -->
+                    <div class="col-md-12">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-3 me-3">
+                                <span style="font-size: 1.5rem;">💻</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">GitHub</small>
+                                <a href="{{ github }}" target="_blank" class="text-decoration-none">
+                                    {{ github }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <hr class="my-5">
+                
+                <div class="mb-4">
+                    <h4 class="mb-3">Sobre este proyecto</h4>
+                    <p class="text-muted">
+                        Esta es una aplicación web de gestión de autopartes desarrollada con Python y Django. 
+                        El proyecto incluye funcionalidades de CRUD para categorías, subcategorías y productos, 
+                        así como un sistema completo de autenticación de usuarios.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="mb-3">Tecnologías utilizadas</h4>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary">Python</span>
+                        <span class="badge bg-success">Django</span>
+                        <span class="badge bg-info">Bootstrap 5</span>
+                        <span class="badge bg-secondary">SQLite</span>
+                        <span class="badge bg-warning text-dark">HTML/CSS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
