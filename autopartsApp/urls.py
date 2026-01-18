@@ -23,4 +23,7 @@ urlpatterns = [
     path("register/", register_view, name="register"),
     path("logout/", logout_view, name="logout"),
     path("profile/edit/", profile_edit_view, name="profile_edit"),
+    
+    # About Me / Contact URL
+    path("about/", about_me, name="about_me"),
 ]

@@ -146,3 +146,17 @@ def profile_edit_view(request):
         form = ProfileEditForm(instance=request.user)
     
     return render(request, 'autopartsApp/profile_edit.html', {'form': form})
+
+
+# About Me / Contact View
+
+def about_me(request):
+    context = {
+        'name': 'Alejandro Badillo Castilleja',
+        'email': 'kope_alex@hotmail.com',
+        'phone': '8186651164',
+        'location': 'Guadalupe, Nuevo León',
+        'linkedin': 'www.linkedin.com/in/alejandro-badillo25',
+        'github': 'https://github.com/AlejandroBadillo25',
+    }
+    return render(request, 'autopartsApp/about_me.html', context)
