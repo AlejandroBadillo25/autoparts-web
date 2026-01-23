@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from .models import UserProfile
 
 
 class LoginForm(AuthenticationForm):
@@ -73,17 +74,54 @@ class ProfileEditForm(forms.ModelForm):
         }),
         label='Correo electrónico'
     )
-    new_password1 = forms.CharField(
+    phone = forms.CharField(
         required=False,
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej: 8186651164',
+        }),
+        label='Teléfono'
+    )
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Dirección completa',
+            'rows': 3,
+        }),
+        label='Dirección'
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Inicializar campos del perfil si existe
+        if self.instance.pk and hasattr(self.instance, 'profile'):
+            self.fields['phone'].initial = self.instance.profile.phone
+            self.fields['address'].initial = self.instance.profile.address
+
+
+class ChangePasswordForm(forms.Form):
+    current_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Nueva contraseña (opcional)',
+            'placeholder': 'Contraseña actual',
+        }),
+        label='Contraseña actual'
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nueva contraseña',
         }),
         label='Nueva contraseña',
-        help_text='Deja en blanco si no deseas cambiar la contraseña'
+        help_text='Mínimo 8 caracteres'
     )
     new_password2 = forms.CharField(
-        required=False,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'placeholder': 'Confirmar nueva contraseña',
@@ -91,17 +129,22 @@ class ProfileEditForm(forms.ModelForm):
         label='Confirmar nueva contraseña'
     )
 
-    class Meta:
-        model = User
-        fields = ['username', 'email']
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data.get('current_password')
+        if not self.user.check_password(current_password):
+            raise forms.ValidationError('La contraseña actual es incorrecta')
+        return current_password
 
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('new_password1')
         password2 = cleaned_data.get('new_password2')
 
-        if password1 or password2:
-            if password1 != password2:
-                raise forms.ValidationError('Las contraseñas no coinciden')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Las contraseñas no coinciden')
         
         return cleaned_data

@@ -1,65 +1,204 @@
 {% extends "autopartsApp/base.html" %}
 
-{% block title %}Editar Perfil{% endblock title %}
+{% block title %}Mi Perfil{% endblock title %}
 
-{% block content_title %}Editar Perfil{% endblock content_title %}
+{% block content_title %}Mi Perfil{% endblock content_title %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.non_field_errors }}
-                        </div>
-                    {% endif %}
-                    
-                    <div class="mb-3">
-                        {{ form.username.label_tag }}
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <div class="text-danger small">{{ form.username.errors }}</div>
-                        {% endif %}
+    <div class="col-lg-8">
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                    Información Personal
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                    Seguridad
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tabs Content -->
+        <div class="tab-content" id="profileTabsContent">
+            
+            <!-- Tab 1: Información Personal -->
+            <div class="tab-pane fade show active" id="info" role="tabpanel">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Información Personal</h5>
+                        <form method="post" action="{% url 'accountsApp:profile_edit' %}">
+                            {% csrf_token %}
+                            
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.username.label_tag }}
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger small">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    {{ form.email.label_tag }}
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.phone.label_tag }}
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger small">{{ form.phone.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    {{ form.address.label_tag }}
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                        <div class="text-danger small">{{ form.address.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Guardar Cambios
+                            </button>
+                        </form>
                     </div>
-                    
-                    <div class="mb-3">
-                        {{ form.email.label_tag }}
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                            <div class="text-danger small">{{ form.email.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <hr class="my-3">
-                    <h5 class="mb-3">Cambiar Contraseña (Opcional)</h5>
-                    
-                    <div class="mb-3">
-                        {{ form.new_password1.label_tag }}
-                        {{ form.new_password1 }}
-                        {% if form.new_password1.errors %}
-                            <div class="text-danger small">{{ form.new_password1.errors }}</div>
-                        {% endif %}
-                        {% if form.new_password1.help_text %}
-                            <div class="form-text">{{ form.new_password1.help_text }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.new_password2.label_tag }}
-                        {{ form.new_password2 }}
-                        {% if form.new_password2.errors %}
-                            <div class="text-danger small">{{ form.new_password2.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
-                </form>
+                </div>
             </div>
+            
+            <!-- Tab 2: Seguridad -->
+            <div class="tab-pane fade" id="security" role="tabpanel">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Configuración de Seguridad</h5>
+                        
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded mb-3">
+                            <div>
+                                <h6 class="mb-1">Contraseña</h6>
+                                <p class="text-muted small mb-0">Actualiza tu contraseña periódicamente para mantener tu cuenta segura</p>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                Cambiar Contraseña
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>
+
+<!-- Modal: Cambiar Contraseña -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Cambiar Contraseña</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changePasswordForm" method="post" action="{% url 'accountsApp:change_password' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div id="passwordFormErrors"></div>
+                    
+                    <div class="mb-3">
+                        <label for="id_current_password" class="form-label">Contraseña actual</label>
+                        <input type="password" class="form-control" id="id_current_password" name="current_password" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_new_password1" class="form-label">Nueva contraseña</label>
+                        <input type="password" class="form-control" id="id_new_password1" name="new_password1" required>
+                        <div class="form-text">Mínimo 8 caracteres</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_new_password2" class="form-label">Confirmar nueva contraseña</label>
+                        <input type="password" class="form-control" id="id_new_password2" name="new_password2" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const errorDiv = document.getElementById('passwordFormErrors');
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+            modal.hide();
+            
+            // Limpiar formulario
+            form.reset();
+            errorDiv.innerHTML = '';
+            
+            // Mostrar mensaje de éxito
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                ${data.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container.my-5').insertBefore(alertDiv, document.querySelector('.row'));
+            
+            // Auto-desaparecer después de 3 segundos
+            setTimeout(() => alertDiv.remove(), 3000);
+        } else {
+            // Mostrar errores
+            let errorHtml = '<div class="alert alert-danger"><ul class="mb-0">';
+            for (let field in data.errors) {
+                data.errors[field].forEach(error => {
+                    errorHtml += `<li>${error}</li>`;
+                });
+            }
+            errorHtml += '</ul></div>';
+            errorDiv.innerHTML = errorHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        errorDiv.innerHTML = '<div class="alert alert-danger">Error al actualizar la contraseña</div>';
+    });
+});
+</script>
+
 {% endblock content %}
