@@ -18,12 +18,6 @@ urlpatterns = [
     path("products/", products, name="products"),
     path("products/create/", products_create, name="products_create"),
     
-    # Authentication URLs
-    path("login/", login_view, name="login"),
-    path("register/", register_view, name="register"),
-    path("logout/", logout_view, name="logout"),
-    path("profile/edit/", profile_edit_view, name="profile_edit"),
-    
     # About Me / Contact URL
     path("about/", about_me, name="about_me"),
 ]
