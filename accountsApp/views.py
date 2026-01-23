@@ -57,13 +57,18 @@ def profile_edit_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
-        form = ProfileEditForm(request.POST, instance=request.user)
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save()
             
-            # Actualizar o crear perfil con phone y address
+            # Actualizar o crear perfil con phone, address y profile_image
             profile.phone = form.cleaned_data.get('phone')
             profile.address = form.cleaned_data.get('address')
+            
+            # Guardar imagen de perfil si fue proporcionada
+            if 'profile_image' in request.FILES:
+                profile.profile_image = request.FILES['profile_image']
+            
             profile.save()
             
             messages.success(request, 'Perfil actualizado exitosamente.')
@@ -71,7 +76,7 @@ def profile_edit_view(request):
     else:
         form = ProfileEditForm(instance=request.user)
     
-    return render(request, 'accountsApp/profile_edit.html', {'form': form})
+    return render(request, 'accountsApp/profile_edit.html', {'form': form, 'profile': profile})
 
 
 @login_required
