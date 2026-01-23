@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import LoginForm, RegisterForm, ProfileEditForm
+from django.http import JsonResponse
+from .forms import LoginForm, RegisterForm, ProfileEditForm, ChangePasswordForm
+from .models import UserProfile
 
 
 def login_view(request):
@@ -33,6 +35,8 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Crear perfil de usuario automáticamente
+            UserProfile.objects.create(user=user)
             messages.success(request, f'Cuenta creada exitosamente')
             return redirect('accountsApp:login')
     else:
@@ -49,23 +53,48 @@ def logout_view(request):
 
 @login_required
 def profile_edit_view(request):
+    # Crear perfil si no existe
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
     if request.method == 'POST':
         form = ProfileEditForm(request.POST, instance=request.user)
         if form.is_valid():
             user = form.save()
             
-            # Cambiar contraseña si se proporcionó una nueva
-            new_password = form.cleaned_data.get('new_password1')
-            if new_password:
-                user.set_password(new_password)
-                user.save()
-                update_session_auth_hash(request, user)  # Mantener la sesión activa
-                messages.success(request, 'Perfil y contraseña actualizados exitosamente.')
-            else:
-                messages.success(request, 'Perfil actualizado exitosamente.')
+            # Actualizar o crear perfil con phone y address
+            profile.phone = form.cleaned_data.get('phone')
+            profile.address = form.cleaned_data.get('address')
+            profile.save()
             
+            messages.success(request, 'Perfil actualizado exitosamente.')
             return redirect('accountsApp:profile_edit')
     else:
         form = ProfileEditForm(instance=request.user)
     
     return render(request, 'accountsApp/profile_edit.html', {'form': form})
+
+
+@login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data.get('new_password1')
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)  # Mantener la sesión activa
+            
+            # Respuesta para AJAX
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'message': 'Contraseña actualizada exitosamente.'})
+            
+            messages.success(request, 'Contraseña actualizada exitosamente.')
+            return redirect('accountsApp:profile_edit')
+        else:
+            # Respuesta para AJAX con errores
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+            
+            messages.error(request, 'Error al actualizar la contraseña.')
+    
+    return redirect('accountsApp:profile_edit')
