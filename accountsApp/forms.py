@@ -92,6 +92,15 @@ class ProfileEditForm(forms.ModelForm):
         }),
         label='Dirección'
     )
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/jpeg,image/png',
+        }),
+        label='Foto de Perfil',
+        help_text='Formatos: JPG, PNG (máx 5MB)'
+    )
 
     class Meta:
         model = User
@@ -103,6 +112,19 @@ class ProfileEditForm(forms.ModelForm):
         if self.instance.pk and hasattr(self.instance, 'profile'):
             self.fields['phone'].initial = self.instance.profile.phone
             self.fields['address'].initial = self.instance.profile.address
+    
+    def clean_profile_image(self):
+        image = self.cleaned_data.get('profile_image')
+        if image:
+            # Validar tamaño (5MB = 5 * 1024 * 1024 bytes)
+            if image.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('La imagen no puede superar los 5MB')
+            
+            # Validar formato
+            if not image.content_type in ['image/jpeg', 'image/png']:
+                raise forms.ValidationError('Solo se permiten archivos JPG y PNG')
+        
+        return image
 
 
 class ChangePasswordForm(forms.Form):
