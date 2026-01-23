@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "autopartsApp",
+    "accountsApp",
 ]
 
 MIDDLEWARE = [
@@ -129,7 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "autopartsApp:home"
 
 # URL to redirect when login is required
-LOGIN_URL = "autopartsApp:login"
+LOGIN_URL = "accountsApp:login"
 
 # URL to redirect after logout
 LOGOUT_REDIRECT_URL = "autopartsApp:home"

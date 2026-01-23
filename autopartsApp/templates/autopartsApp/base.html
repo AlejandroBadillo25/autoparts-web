@@ -30,11 +30,11 @@
                             {% if user.is_authenticated %}
                                 <li><a class="dropdown-item disabled" href="#">{{ user.username }}</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'autopartsApp:profile_edit' %}">Editar Perfil</a></li>
-                                <li><a class="dropdown-item" href="{% url 'autopartsApp:logout' %}">Cerrar Sesión</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accountsApp:profile_edit' %}">Editar Perfil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accountsApp:logout' %}">Cerrar Sesión</a></li>
                             {% else %}
-                                <li><a class="dropdown-item" href="{% url 'autopartsApp:login' %}">Iniciar Sesión</a></li>
-                                <li><a class="dropdown-item" href="{% url 'autopartsApp:register' %}">Registrarse</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accountsApp:login' %}">Iniciar Sesión</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accountsApp:register' %}">Registrarse</a></li>
                             {% endif %}
                         </ul>
                     </li>
