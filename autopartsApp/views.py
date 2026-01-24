@@ -127,6 +127,11 @@ def products(request):
     })
 
 @login_required
+def products_detail(request, pk):
+    product = get_object_or_404(Products, pk=pk)
+    return render(request, 'autopartsApp/products_detail.html', {'product': product})
+
+@login_required
 def products_create(request):
     if request.method == 'POST':
         form = ProductsForm(request.POST)
@@ -137,6 +142,28 @@ def products_create(request):
     else:
         form = ProductsForm()
     return render(request, 'autopartsApp/products_form.html', {'form': form, 'title': 'Crear Producto'})
+
+@login_required
+def products_edit(request, pk):
+    product = get_object_or_404(Products, pk=pk)
+    if request.method == 'POST':
+        form = ProductsForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Producto actualizado exitosamente.')
+            return redirect('autopartsApp:products')
+    else:
+        form = ProductsForm(instance=product)
+    return render(request, 'autopartsApp/products_form.html', {'form': form, 'title': 'Editar Producto'})
+
+@login_required
+def products_delete(request, pk):
+    product = get_object_or_404(Products, pk=pk)
+    if request.method == 'POST':
+        product.delete()
+        messages.success(request, 'Producto eliminado exitosamente.')
+        return redirect('autopartsApp:products')
+    return render(request, 'autopartsApp/products_confirm_delete.html', {'product': product})
 
 
 # About Me / Contact View

@@ -23,6 +23,9 @@ urlpatterns = [
     # Products URLs
     path("products/", products, name="products"),
     path("products/create/", products_create, name="products_create"),
+    path("products/<int:pk>/", products_detail, name="products_detail"),
+    path("products/<int:pk>/edit/", products_edit, name="products_edit"),
+    path("products/<int:pk>/delete/", products_delete, name="products_delete"),
     
     # About Me / Contact URL
     path("about/", about_me, name="about_me"),
