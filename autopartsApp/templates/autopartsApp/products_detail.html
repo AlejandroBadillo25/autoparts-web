@@ -1,0 +1,65 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Detalle de {{ product.name }}
+{% endblock title %}
+
+{% block content_title %}
+    Detalle de Producto
+{% endblock content_title %}
+
+{% block content %}
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ product.name }}</h5>
+            <div>
+                <a href="{% url 'autopartsApp:products_edit' product.pk %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <button type="button" class="btn btn-sm btn-danger" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteModal"
+                        data-delete-url="{% url 'autopartsApp:products_delete' product.pk %}"
+                        data-item-name="{{ product.name }}">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID:</strong> {{ product.id }}</p>
+                    <p><strong>Nombre:</strong> {{ product.name }}</p>
+                    <p><strong>Categoría:</strong> 
+                        <a href="{% url 'autopartsApp:category_detail' product.category.pk %}" class="badge bg-info text-decoration-none">
+                            {{ product.category.name }} <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </p>
+                    <p><strong>Subcategoría:</strong> 
+                        <a href="{% url 'autopartsApp:subcategory_detail' product.subcategory.pk %}" class="badge bg-info text-decoration-none">
+                            {{ product.subcategory.name }} <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Precio:</strong> <span class="text-success fs-4">${{ product.price }}</span></p>
+                    <p><strong>Stock disponible:</strong> <span class="badge bg-success">{{ product.stock }} unidades</span></p>
+                    <p><strong>Fecha de creación:</strong> {{ product.created_at|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Última actualización:</strong> {{ product.updated_at|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="mb-3">
+                <strong>Descripción:</strong>
+                <p class="mt-2">{{ product.description|default:"Sin descripción" }}</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'autopartsApp:products' %}" class="btn btn-secondary">
+                Volver
+            </a>
+        </div>
+    </div>
+{% endblock content %}
