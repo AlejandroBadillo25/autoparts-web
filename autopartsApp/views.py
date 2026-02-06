@@ -30,7 +30,7 @@ def category_detail(request, pk):
 @login_required
 def category_create(request):
     if request.method == 'POST':
-        form = CategoryForm(request.POST)
+        form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Categoría creada exitosamente.')
@@ -43,7 +43,7 @@ def category_create(request):
 def category_edit(request, pk):
     category_obj = get_object_or_404(Category, pk=pk)
     if request.method == 'POST':
-        form = CategoryForm(request.POST, instance=category_obj)
+        form = CategoryForm(request.POST, request.FILES, instance=category_obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'Categoría actualizada exitosamente.')
@@ -82,7 +82,7 @@ def subcategory_detail(request, pk):
 @login_required
 def subcategory_create(request):
     if request.method == 'POST':
-        form = SubcategoryForm(request.POST)
+        form = SubcategoryForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Subcategoría creada exitosamente.')
@@ -95,7 +95,7 @@ def subcategory_create(request):
 def subcategory_edit(request, pk):
     subcategory_obj = get_object_or_404(Subcategory, pk=pk)
     if request.method == 'POST':
-        form = SubcategoryForm(request.POST, instance=subcategory_obj)
+        form = SubcategoryForm(request.POST, request.FILES, instance=subcategory_obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'Subcategoría actualizada exitosamente.')
@@ -134,7 +134,7 @@ def products_detail(request, pk):
 @login_required
 def products_create(request):
     if request.method == 'POST':
-        form = ProductsForm(request.POST)
+        form = ProductsForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Producto creado exitosamente.')
@@ -147,7 +147,7 @@ def products_create(request):
 def products_edit(request, pk):
     product = get_object_or_404(Products, pk=pk)
     if request.method == 'POST':
-        form = ProductsForm(request.POST, instance=product)
+        form = ProductsForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             messages.success(request, 'Producto actualizado exitosamente.')

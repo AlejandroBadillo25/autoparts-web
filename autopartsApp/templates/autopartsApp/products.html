@@ -33,10 +33,20 @@
         <div class="row">
             {% for product in products %}
                 <div class="col-md-6 mb-3">
-                    <div class="card shadow">
+                    <div class="card shadow h-100">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-box-seam text-white" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
                         <div class="card-body position-relative">
                             {% if user.is_authenticated %}
                                 <div class="position-absolute top-0 end-0 m-2">
+                                    <a href="{% url 'autopartsApp:products_detail' product.pk %}" class="btn btn-sm btn-info me-1" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
                                     <a href="{% url 'autopartsApp:products_edit' product.pk %}" class="btn btn-sm btn-warning me-1" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>

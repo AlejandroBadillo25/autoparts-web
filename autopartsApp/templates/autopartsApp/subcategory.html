@@ -32,35 +32,46 @@
     {% if subcategories %}
         <ul class="list-group shadow">
             {% for subcat in subcategories %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="fw-bold">{{ subcat.name }}</span>
-                        <p class="mb-0 text-muted">
-                            <small>Categoría: {{ subcat.category.name }}</small><br>
-                            {{ subcat.description|truncatewords:15 }}
-                        </p>
-                        <small class="text-muted">Creada: {{ subcat.created_at|date:"d/m/Y" }}</small>
-                    </div>
-                    {% if user.is_authenticated %}
-                        <div class="btn-group" role="group">
-                            <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="btn btn-sm btn-info" title="Ver detalle">
-                                <i class="bi bi-eye"></i> Ver
-                            </a>
-                            <a href="{% url 'autopartsApp:subcategory_edit' subcat.pk %}" class="btn btn-sm btn-warning" title="Editar">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <button type="button" class="btn btn-sm btn-danger" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#deleteModal"
-                                    data-delete-url="{% url 'autopartsApp:subcategory_delete' subcat.pk %}"
-                                    data-item-name="{{ subcat.name }}"
-                                    title="Eliminar">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3" style="flex: 1; min-width: 0;">
+                            {% if subcat.image %}
+                                <img src="{{ subcat.image.url }}" alt="{{ subcat.name }}" class="rounded flex-shrink-0" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center flex-shrink-0" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-image text-white fs-3"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <span class="fw-bold">{{ subcat.name }}</span>
+                                <p class="mb-0 text-muted">
+                                    <small>Categoría: {{ subcat.category.name }}</small><br>
+                                    {{ subcat.description|truncatewords:15 }}
+                                </p>
+                                <small class="text-muted">Creada: {{ subcat.created_at|date:"d/m/Y" }}</small>
+                            </div>
                         </div>
-                    {% else %}
-                        <span class="badge bg-primary rounded-pill">{{ subcat.created_at|date:"d/m/Y" }}</span>
-                    {% endif %}
+                        {% if user.is_authenticated %}
+                            <div class="btn-group flex-shrink-0" role="group">
+                                <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="btn btn-sm btn-info" title="Ver detalle">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <a href="{% url 'autopartsApp:subcategory_edit' subcat.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal"
+                                        data-delete-url="{% url 'autopartsApp:subcategory_delete' subcat.pk %}"
+                                        data-item-name="{{ subcat.name }}"
+                                        title="Eliminar">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        {% else %}
+                            <span class="badge bg-primary rounded-pill flex-shrink-0">{{ subcat.created_at|date:"d/m/Y" }}</span>
+                        {% endif %}
+                    </div>
                 </li>
             {% endfor %}
         </ul>
