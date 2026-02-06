@@ -26,6 +26,12 @@
             </div>
         </div>
         <div class="card-body">
+            {% if product.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow" style="max-height: 400px; object-fit: cover;">
+                </div>
+            {% endif %}
+            
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>ID:</strong> {{ product.id }}</p>

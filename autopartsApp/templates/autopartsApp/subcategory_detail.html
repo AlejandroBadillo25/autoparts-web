@@ -26,6 +26,12 @@
             </div>
         </div>
         <div class="card-body">
+            {% if subcategory.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ subcategory.image.url }}" alt="{{ subcategory.name }}" class="img-fluid rounded shadow" style="max-height: 300px; object-fit: cover;">
+                </div>
+            {% endif %}
+            
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>ID:</strong> {{ subcategory.id }}</p>
