@@ -12,6 +12,7 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ category.name }}</h5>
+            {% if user.is_authenticated %}
             <div>
                 <a href="{% url 'autopartsApp:category_edit' category.pk %}" class="btn btn-sm btn-warning">
                     <i class="bi bi-pencil"></i> Editar
@@ -24,6 +25,7 @@
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </div>
+            {% endif %}
         </div>
         <div class="card-body">
             {% if category.image %}
@@ -54,17 +56,29 @@
             
             <div>
                 <strong>Subcategorías asociadas:</strong>
-                {% if category.subcategory_set.all %}
-                    <ul class="list-group mt-2">
-                        {% for subcat in category.subcategory_set.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {{ subcat.name }}
-                                <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="btn btn-sm btn-info">
-                                    Ver <i class="bi bi-arrow-right"></i>
+                {% if category.subcategories.all %}
+                    <div class="row mt-3">
+                        {% for subcat in category.subcategories.all %}
+                            <div class="col-md-6 mb-3">
+                                <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="text-decoration-none">
+                                    <div class="card h-100 shadow-sm hover-shadow">
+                                        {% if subcat.image %}
+                                            <img src="{{ subcat.image.url }}" class="card-img-top" alt="{{ subcat.name }}" style="height: 150px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                <i class="bi bi-image text-white fs-1"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title text-dark">{{ subcat.name }}</h5>
+                                            <p class="card-text text-muted small">{{ subcat.description|truncatewords:10 }}</p>
+                                            <span class="badge bg-info">{{ subcat.products.count }} producto{{ subcat.products.count|pluralize }}</span>
+                                        </div>
+                                    </div>
                                 </a>
-                            </li>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
                     <p class="text-muted mt-2">No hay subcategorías asociadas a esta categoría.</p>
                 {% endif %}

@@ -9,9 +9,15 @@
 {% endblock content_title %}
 
 {% block content %}
+    <!-- Banners específicos de esta subcategoría -->
+    {% if subcategory_specific_banners %}
+        {% include 'autopartsBannersApp/banner_display.html' with banners=subcategory_specific_banners %}
+    {% endif %}
+    
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ subcategory.name }}</h5>
+            {% if user.is_authenticated %}
             <div>
                 <a href="{% url 'autopartsApp:subcategory_edit' subcategory.pk %}" class="btn btn-sm btn-warning">
                     <i class="bi bi-pencil"></i> Editar
@@ -24,6 +30,7 @@
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </div>
+            {% endif %}
         </div>
         <div class="card-body">
             {% if subcategory.image %}
@@ -59,19 +66,32 @@
             
             <div>
                 <strong>Productos asociados:</strong>
-                {% if subcategory.products_set.all %}
-                    <ul class="list-group mt-2">
-                        {% for product in subcategory.products_set.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ product.name }}</strong>
-                                    <br>
-                                    <small class="text-muted">Precio: ${{ product.price }}</small>
-                                </div>
-                                <span class="badge bg-success">{{ product.stock }} en stock</span>
-                            </li>
+                {% if subcategory.products.all %}
+                    <div class="row mt-3">
+                        {% for product in subcategory.products.all %}
+                            <div class="col-md-6 mb-3">
+                                <a href="{% url 'autopartsApp:products_detail' product.pk %}" class="text-decoration-none">
+                                    <div class="card h-100 shadow-sm hover-shadow">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                <i class="bi bi-box-seam text-white" style="font-size: 3rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title text-dark">{{ product.name }}</h5>
+                                            <p class="card-text text-muted small">{{ product.description|truncatewords:15 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-success fw-bold fs-5">${{ product.price }}</span>
+                                                <span class="badge bg-success">{{ product.stock }} en stock</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
                     <p class="text-muted mt-2">No hay productos asociados a esta subcategoría.</p>
                 {% endif %}

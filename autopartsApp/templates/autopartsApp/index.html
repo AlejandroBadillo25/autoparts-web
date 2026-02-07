@@ -9,6 +9,9 @@
 {% endblock content_title %}
 
 {% block content %}
+    <!-- Banners de Inicio -->
+    {% include 'autopartsBannersApp/banner_display.html' with banners=banners_inicio %}
+    
     {% if products %}
         <div class="row">
             {% for product in products %}

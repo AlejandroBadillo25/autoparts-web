@@ -1,0 +1,102 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Gestión de Banners
+{% endblock title %}
+
+{% block content_title %}
+    Gestión de Banners
+{% endblock content_title %}
+
+{% block content %}
+    <div class="mb-3">
+        <a href="{% url 'autopartsBannersApp:banner_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Crear Nuevo Banner
+        </a>
+    </div>
+
+    {% if banners %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped shadow">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Sección</th>
+                        <th>Categoría/Subcategoría</th>
+                        <th>Vigencia</th>
+                        <th>Estado</th>
+                        <th>Orden</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for banner in banners %}
+                        <tr>
+                            <td>
+                                {% if banner.image %}
+                                    <img src="{{ banner.image.url }}" alt="{{ banner.name }}" style="width: 100px; height: 50px; object-fit: cover;" class="rounded">
+                                {% else %}
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 100px; height: 50px;">
+                                        <i class="bi bi-image text-white"></i>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ banner.name }}</td>
+                            <td><span class="badge bg-info">{{ banner.get_section_display }}</span></td>
+                            <td>
+                                {% if banner.category %}
+                                    <small class="text-muted">Cat: {{ banner.category.name }}</small>
+                                {% elif banner.subcategory %}
+                                    <small class="text-muted">Subcat: {{ banner.subcategory.name }}</small>
+                                {% else %}
+                                    <small class="text-muted">General</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ banner.start_date|date:"d/m/Y" }} - {{ banner.end_date|date:"d/m/Y" }}</small>
+                                {% if banner.is_valid_date_range %}
+                                    <br><span class="badge bg-success">Vigente</span>
+                                {% else %}
+                                    <br><span class="badge bg-warning">Fuera de rango</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if banner.is_active %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ banner.order }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'autopartsBannersApp:banner_toggle_active' banner.pk %}" 
+                                       class="btn btn-{% if banner.is_active %}secondary{% else %}success{% endif %}" 
+                                       title="{% if banner.is_active %}Desactivar{% else %}Activar{% endif %}">
+                                        <i class="bi bi-{% if banner.is_active %}pause{% else %}play{% endif %}-circle"></i>
+                                    </a>
+                                    <a href="{% url 'autopartsBannersApp:banner_edit' banner.pk %}" class="btn btn-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal"
+                                            data-delete-url="{% url 'autopartsBannersApp:banner_delete' banner.pk %}"
+                                            data-item-name="{{ banner.name }}"
+                                            title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No hay banners registrados. <a href="{% url 'autopartsBannersApp:banner_create' %}">Crea el primero</a>
+        </div>
+    {% endif %}
+{% endblock content %}

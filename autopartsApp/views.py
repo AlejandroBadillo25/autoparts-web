@@ -22,7 +22,6 @@ def category(request):
         'busqueda': busqueda
     })
 
-@login_required
 def category_detail(request, pk):
     category_obj = get_object_or_404(Category, pk=pk)
     return render(request, 'autopartsApp/category_detail.html', {'category': category_obj})
@@ -74,10 +73,25 @@ def subcategory(request):
         'busqueda': busqueda
     })
 
-@login_required
 def subcategory_detail(request, pk):
+    from datetime import date
+    from autopartsBannersApp.models import Banner
+    
     subcategory_obj = get_object_or_404(Subcategory, pk=pk)
-    return render(request, 'autopartsApp/subcategory_detail.html', {'subcategory': subcategory_obj})
+    today = date.today()
+    
+    # Obtener banners específicos de esta subcategoría
+    subcategory_banners = Banner.objects.filter(
+        is_active=True,
+        start_date__lte=today,
+        end_date__gte=today,
+        subcategory=subcategory_obj
+    )
+    
+    return render(request, 'autopartsApp/subcategory_detail.html', {
+        'subcategory': subcategory_obj,
+        'subcategory_specific_banners': subcategory_banners
+    })
 
 @login_required
 def subcategory_create(request):
@@ -126,7 +140,6 @@ def products(request):
         'busqueda': busqueda
     })
 
-@login_required
 def products_detail(request, pk):
     product = get_object_or_404(Products, pk=pk)
     return render(request, 'autopartsApp/products_detail.html', {'product': product})

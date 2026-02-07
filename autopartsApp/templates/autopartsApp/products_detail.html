@@ -12,6 +12,7 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ product.name }}</h5>
+            {% if user.is_authenticated %}
             <div>
                 <a href="{% url 'autopartsApp:products_edit' product.pk %}" class="btn btn-sm btn-warning">
                     <i class="bi bi-pencil"></i> Editar
@@ -24,6 +25,7 @@
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </div>
+            {% endif %}
         </div>
         <div class="card-body">
             {% if product.image %}

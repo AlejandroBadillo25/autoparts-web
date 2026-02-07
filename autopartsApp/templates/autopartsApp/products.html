@@ -9,6 +9,9 @@
 {% endblock content_title %}
 
 {% block content %}
+    <!-- Banners de Productos -->
+    {% include 'autopartsBannersApp/banner_display.html' with banners=banners_productos %}
+    
     {% if user.is_authenticated %}
         <a href="{% url 'autopartsApp:products_create' %}" class="btn btn-primary mb-3">Crear nuevo producto</a>
     {% endif %}
