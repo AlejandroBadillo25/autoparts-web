@@ -12,25 +12,9 @@
     <!-- Banners de Subcategorías -->
     {% include 'autopartsBannersApp/banner_display.html' with banners=banners_subcategorias %}
     
-    {% if user.is_authenticated %}
-        <a href="{% url 'autopartsApp:subcategory_create' %}" class="btn btn-primary mb-3">Crear nueva subcategoría</a>
-    {% endif %}
+    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:subcategory_create' label='Crear nueva subcategoría' %}
     
-    <form action="{% url 'autopartsApp:subcategory' %}" method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar subcategoría..." class="form-control">
-            <button type="submit" class="btn btn-secondary">Buscar</button>
-            {% if busqueda %}
-                <a href="{% url 'autopartsApp:subcategory' %}" class="btn btn-outline-secondary">Limpiar</a>
-            {% endif %}
-        </div>
-    </form>
-
-    {% if busqueda %}
-        <div class="alert alert-info">
-            Mostrando resultados para: <strong>"{{ busqueda }}"</strong> ({{ subcategories.count }} resultado{{ subcategories.count|pluralize }})
-        </div>
-    {% endif %}
+    {% include 'autopartsApp/includes/search_bar.html' with search_url='autopartsApp:subcategory' placeholder='Buscar subcategoría...' result_count=subcategories.count %}
 
     {% if subcategories %}
         <ul class="list-group shadow">

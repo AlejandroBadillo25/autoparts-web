@@ -1,78 +1,89 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.urls import reverse_lazy
 from .models import Banner
 from .forms import BannerForm
 
-# Create your views here.
 
-def is_staff_or_superuser(user):
-    """Verifica si el usuario tiene permisos para gestionar banners"""
-    return user.is_staff or user.is_superuser
+# ==================== MIXIN PERSONALIZADO ====================
 
-@login_required
-@user_passes_test(is_staff_or_superuser, login_url='autopartsApp:home')
-def banner_list(request):
+class StaffOrSuperuserRequiredMixin(UserPassesTestMixin):
+    """Mixin que verifica si el usuario es staff o superuser"""
+    login_url = 'autopartsApp:home'
+    
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+
+
+# ==================== BANNER VIEWS ====================
+
+class BannerListView(LoginRequiredMixin, StaffOrSuperuserRequiredMixin, ListView):
     """Lista todos los banners"""
-    banners = Banner.objects.all()
-    return render(request, 'autopartsBannersApp/banner_list.html', {'banners': banners})
+    model = Banner
+    template_name = 'autopartsBannersApp/banner_list.html'
+    context_object_name = 'banners'
 
-@login_required
-@user_passes_test(is_staff_or_superuser, login_url='autopartsApp:home')
-def banner_create(request):
+
+class BannerCreateView(LoginRequiredMixin, StaffOrSuperuserRequiredMixin, CreateView):
     """Crea un nuevo banner"""
-    if request.method == 'POST':
-        form = BannerForm(request.POST, request.FILES)
-        if form.is_valid():
-            banner = form.save(commit=False)
-            banner.created_by = request.user
-            banner.save()
-            messages.success(request, 'Banner creado exitosamente.')
-            return redirect('autopartsBannersApp:banner_list')
-    else:
-        form = BannerForm()
-    return render(request, 'autopartsBannersApp/banner_form.html', {
-        'form': form,
-        'title': 'Crear Nuevo Banner'
-    })
+    model = Banner
+    form_class = BannerForm
+    template_name = 'autopartsBannersApp/banner_form.html'
+    success_url = reverse_lazy('autopartsBannersApp:banner_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Nuevo Banner'
+        return context
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        messages.success(self.request, 'Banner creado exitosamente.')
+        return super().form_valid(form)
 
-@login_required
-@user_passes_test(is_staff_or_superuser, login_url='autopartsApp:home')
-def banner_edit(request, pk):
+
+class BannerUpdateView(LoginRequiredMixin, StaffOrSuperuserRequiredMixin, UpdateView):
     """Edita un banner existente"""
-    banner = get_object_or_404(Banner, pk=pk)
-    if request.method == 'POST':
-        form = BannerForm(request.POST, request.FILES, instance=banner)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Banner actualizado exitosamente.')
-            return redirect('autopartsBannersApp:banner_list')
-    else:
-        form = BannerForm(instance=banner)
-    return render(request, 'autopartsBannersApp/banner_form.html', {
-        'form': form,
-        'title': 'Editar Banner',
-        'banner': banner
-    })
+    model = Banner
+    form_class = BannerForm
+    template_name = 'autopartsBannersApp/banner_form.html'
+    success_url = reverse_lazy('autopartsBannersApp:banner_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Editar Banner'
+        context['banner'] = self.object
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Banner actualizado exitosamente.')
+        return super().form_valid(form)
 
-@login_required
-@user_passes_test(is_staff_or_superuser, login_url='autopartsApp:home')
-def banner_delete(request, pk):
+
+class BannerDeleteView(LoginRequiredMixin, StaffOrSuperuserRequiredMixin, DeleteView):
     """Elimina un banner"""
-    banner = get_object_or_404(Banner, pk=pk)
-    if request.method == 'POST':
-        banner.delete()
-        messages.success(request, 'Banner eliminado exitosamente.')
-        return redirect('autopartsBannersApp:banner_list')
-    return render(request, 'autopartsBannersApp/banner_confirm_delete.html', {'banner': banner})
+    model = Banner
+    template_name = 'autopartsBannersApp/banner_confirm_delete.html'
+    context_object_name = 'banner'
+    success_url = reverse_lazy('autopartsBannersApp:banner_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Banner eliminado exitosamente.')
+        return super().delete(request, *args, **kwargs)
 
-@login_required
-@user_passes_test(is_staff_or_superuser, login_url='autopartsApp:home')
-def banner_toggle_active(request, pk):
+
+class BannerToggleActiveView(LoginRequiredMixin, StaffOrSuperuserRequiredMixin, View):
     """Activa/desactiva un banner"""
-    banner = get_object_or_404(Banner, pk=pk)
-    banner.is_active = not banner.is_active
-    banner.save()
-    status = 'activado' if banner.is_active else 'desactivado'
-    messages.success(request, f'Banner {status} exitosamente.')
-    return redirect('autopartsBannersApp:banner_list')
+    
+    def post(self, request, pk):
+        banner = get_object_or_404(Banner, pk=pk)
+        banner.is_active = not banner.is_active
+        banner.save()
+        status = 'activado' if banner.is_active else 'desactivado'
+        messages.success(request, f'Banner {status} exitosamente.')
+        return redirect('autopartsBannersApp:banner_list')
+    
+    def get(self, request, pk):
+        return self.post(request, pk)

@@ -1,87 +1,114 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
+from django.views.generic import FormView, View, UpdateView
+from django.urls import reverse_lazy
 from .forms import LoginForm, RegisterForm, ProfileEditForm, ChangePasswordForm
 from .models import UserProfile
 
 
-def login_view(request):
-    if request.user.is_authenticated:
+# ==================== AUTHENTICATION VIEWS ====================
+
+class LoginView(FormView):
+    """Vista para login de usuarios"""
+    form_class = LoginForm
+    template_name = 'accountsApp/login.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('autopartsApp:home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            messages.success(self.request, f'¡Bienvenido {username}!')
+            return redirect('autopartsApp:home')
+        return super().form_valid(form)
+
+
+class RegisterView(FormView):
+    """Vista para registro de nuevos usuarios"""
+    form_class = RegisterForm
+    template_name = 'accountsApp/register.html'
+    success_url = reverse_lazy('accountsApp:login')
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('autopartsApp:home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        user = form.save()
+        # Crear perfil de usuario automáticamente
+        UserProfile.objects.create(user=user)
+        messages.success(self.request, 'Cuenta creada exitosamente')
+        return super().form_valid(form)
+
+
+class LogoutView(View):
+    """Vista para cerrar sesión"""
+    def get(self, request):
+        logout(request)
+        messages.info(request, 'Has cerrado sesión exitosamente.')
         return redirect('autopartsApp:home')
     
-    if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'¡Bienvenido {username}!')
-                return redirect('autopartsApp:home')
-    else:
-        form = LoginForm()
+    def post(self, request):
+        return self.get(request)
+
+
+# ==================== PROFILE VIEWS ====================
+
+class ProfileEditView(LoginRequiredMixin, FormView):
+    """Vista para editar perfil de usuario"""
+    form_class = ProfileEditForm
+    template_name = 'accountsApp/profile_edit.html'
+    success_url = reverse_lazy('accountsApp:profile_edit')
     
-    return render(request, 'accountsApp/login.html', {'form': form})
-
-
-def register_view(request):
-    if request.user.is_authenticated:
-        return redirect('autopartsApp:home')
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['instance'] = self.request.user
+        return kwargs
     
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Crear perfil de usuario automáticamente
-            UserProfile.objects.create(user=user)
-            messages.success(request, f'Cuenta creada exitosamente')
-            return redirect('accountsApp:login')
-    else:
-        form = RegisterForm()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Crear perfil si no existe
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        context['profile'] = profile
+        return context
     
-    return render(request, 'accountsApp/register.html', {'form': form})
+    def form_valid(self, form):
+        user = form.save()
+        
+        # Actualizar o crear perfil con phone, address y profile_image
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        profile.phone = form.cleaned_data.get('phone')
+        profile.address = form.cleaned_data.get('address')
+        
+        # Guardar imagen de perfil si fue proporcionada
+        if 'profile_image' in self.request.FILES:
+            profile.profile_image = self.request.FILES['profile_image']
+        
+        profile.save()
+        
+        messages.success(self.request, 'Perfil actualizado exitosamente.')
+        return super().form_valid(form)
 
 
-def logout_view(request):
-    logout(request)
-    messages.info(request, 'Has cerrado sesión exitosamente.')
-    return redirect('autopartsApp:home')
-
-
-@login_required
-def profile_edit_view(request):
-    # Crear perfil si no existe
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+class ChangePasswordView(LoginRequiredMixin, View):
+    """Vista para cambiar contraseña"""
     
-    if request.method == 'POST':
-        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            user = form.save()
-            
-            # Actualizar o crear perfil con phone, address y profile_image
-            profile.phone = form.cleaned_data.get('phone')
-            profile.address = form.cleaned_data.get('address')
-            
-            # Guardar imagen de perfil si fue proporcionada
-            if 'profile_image' in request.FILES:
-                profile.profile_image = request.FILES['profile_image']
-            
-            profile.save()
-            
-            messages.success(request, 'Perfil actualizado exitosamente.')
-            return redirect('accountsApp:profile_edit')
-    else:
-        form = ProfileEditForm(instance=request.user)
-    
-    return render(request, 'accountsApp/profile_edit.html', {'form': form, 'profile': profile})
-
-
-@login_required
-def change_password_view(request):
-    if request.method == 'POST':
+    def post(self, request):
         form = ChangePasswordForm(request.user, request.POST)
         if form.is_valid():
             new_password = form.cleaned_data.get('new_password1')
@@ -101,5 +128,5 @@ def change_password_view(request):
                 return JsonResponse({'success': False, 'errors': form.errors})
             
             messages.error(request, 'Error al actualizar la contraseña.')
-    
-    return redirect('accountsApp:profile_edit')
+        
+        return redirect('accountsApp:profile_edit')
