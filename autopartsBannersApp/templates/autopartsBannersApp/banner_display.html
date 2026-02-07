@@ -1,0 +1,13 @@
+<!-- Componente para mostrar banners -->
+{% if banners %}
+    <div class="banners-container mb-4">
+        {% for banner in banners %}
+            <div class="banner-item mb-3">
+                <img src="{{ banner.image.url }}" 
+                     alt="{{ banner.name }}" 
+                     class="img-fluid rounded shadow w-100" 
+                     style="max-height: 300px; object-fit: cover;">
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

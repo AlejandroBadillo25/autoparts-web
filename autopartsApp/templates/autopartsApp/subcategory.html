@@ -9,6 +9,9 @@
 {% endblock content_title %}
 
 {% block content %}
+    <!-- Banners de Subcategorías -->
+    {% include 'autopartsBannersApp/banner_display.html' with banners=banners_subcategorias %}
+    
     {% if user.is_authenticated %}
         <a href="{% url 'autopartsApp:subcategory_create' %}" class="btn btn-primary mb-3">Crear nueva subcategoría</a>
     {% endif %}
@@ -43,7 +46,7 @@
                                 </div>
                             {% endif %}
                             <div class="flex-grow-1" style="min-width: 0;">
-                                <span class="fw-bold">{{ subcat.name }}</span>
+                                <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="fw-bold text-decoration-none text-primary">{{ subcat.name }}</a>
                                 <p class="mb-0 text-muted">
                                     <small>Categoría: {{ subcat.category.name }}</small><br>
                                     {{ subcat.description|truncatewords:15 }}

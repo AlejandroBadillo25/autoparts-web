@@ -1,0 +1,44 @@
+{% extends 'autopartsApp/base.html' %}
+
+{% block title %}
+    Eliminar Banner
+{% endblock title %}
+
+{% block content_title %}
+    Confirmar Eliminación
+{% endblock content_title %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Eliminar Banner
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if banner.image %}
+                        <div class="text-center mb-3">
+                            <img src="{{ banner.image.url }}" alt="{{ banner.name }}" class="img-fluid rounded shadow" style="max-height: 200px;">
+                        </div>
+                    {% endif %}
+                    
+                    <p>¿Estás seguro de que deseas eliminar el banner <strong>"{{ banner.name }}"</strong>?</p>
+                    <p class="text-muted"><strong>Sección:</strong> {{ banner.get_section_display }}</p>
+                    <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Sí, eliminar
+                            </button>
+                            <a href="{% url 'autopartsBannersApp:banner_list' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
