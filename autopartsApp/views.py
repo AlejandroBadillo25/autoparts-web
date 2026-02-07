@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 )
@@ -45,11 +45,13 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
 
 
-class CategoryCreateView(LoginRequiredMixin, CreateView):
+class CategoryCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Category
     form_class = CategoryForm
     template_name = 'autopartsApp/category_form.html'
     success_url = reverse_lazy('autopartsApp:category')
+    permission_required = 'autopartsApp.add_category'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,11 +63,13 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+class CategoryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Category
     form_class = CategoryForm
     template_name = 'autopartsApp/category_form.html'
     success_url = reverse_lazy('autopartsApp:category')
+    permission_required = 'autopartsApp.change_category'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,11 +81,13 @@ class CategoryUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Category
     template_name = 'autopartsApp/category_confirm_delete.html'
     context_object_name = 'category'
     success_url = reverse_lazy('autopartsApp:category')
+    permission_required = 'autopartsApp.delete_category'
+    login_url = 'autopartsApp:home'
     
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'Categoría eliminada exitosamente.')
@@ -130,11 +136,13 @@ class SubcategoryDetailView(DetailView):
         return context
 
 
-class SubcategoryCreateView(LoginRequiredMixin, CreateView):
+class SubcategoryCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Subcategory
     form_class = SubcategoryForm
     template_name = 'autopartsApp/subcategory_form.html'
     success_url = reverse_lazy('autopartsApp:subcategory')
+    permission_required = 'autopartsApp.add_subcategory'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -146,11 +154,13 @@ class SubcategoryCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class SubcategoryUpdateView(LoginRequiredMixin, UpdateView):
+class SubcategoryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Subcategory
     form_class = SubcategoryForm
     template_name = 'autopartsApp/subcategory_form.html'
     success_url = reverse_lazy('autopartsApp:subcategory')
+    permission_required = 'autopartsApp.change_subcategory'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -162,11 +172,13 @@ class SubcategoryUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class SubcategoryDeleteView(LoginRequiredMixin, DeleteView):
+class SubcategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Subcategory
     template_name = 'autopartsApp/subcategory_confirm_delete.html'
     context_object_name = 'subcategory'
     success_url = reverse_lazy('autopartsApp:subcategory')
+    permission_required = 'autopartsApp.delete_subcategory'
+    login_url = 'autopartsApp:home'
     
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'Subcategoría eliminada exitosamente.')
@@ -200,11 +212,13 @@ class ProductsDetailView(DetailView):
     context_object_name = 'product'
 
 
-class ProductsCreateView(LoginRequiredMixin, CreateView):
+class ProductsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Products
     form_class = ProductsForm
     template_name = 'autopartsApp/products_form.html'
     success_url = reverse_lazy('autopartsApp:products')
+    permission_required = 'autopartsApp.add_products'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,11 +230,13 @@ class ProductsCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductsUpdateView(LoginRequiredMixin, UpdateView):
+class ProductsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Products
     form_class = ProductsForm
     template_name = 'autopartsApp/products_form.html'
     success_url = reverse_lazy('autopartsApp:products')
+    permission_required = 'autopartsApp.change_products'
+    login_url = 'autopartsApp:home'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -232,11 +248,13 @@ class ProductsUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ProductsDeleteView(LoginRequiredMixin, DeleteView):
+class ProductsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Products
     template_name = 'autopartsApp/products_confirm_delete.html'
     context_object_name = 'product'
     success_url = reverse_lazy('autopartsApp:products')
+    permission_required = 'autopartsApp.delete_products'
+    login_url = 'autopartsApp:home'
     
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'Producto eliminado exitosamente.')
@@ -251,11 +269,15 @@ class AboutMeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Obtener perfil del usuario si está autenticado
+        # Obtener perfil del usuario "Dumas" para mostrar siempre su foto
+        from django.contrib.auth.models import User
+        from accountsApp.models import UserProfile
         profile = None
-        if self.request.user.is_authenticated:
-            from accountsApp.models import UserProfile
-            profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        try:
+            dumas_user = User.objects.get(username='Dumas')
+            profile, created = UserProfile.objects.get_or_create(user=dumas_user)
+        except User.DoesNotExist:
+            pass
         
         context.update({
             'name': 'Alejandro Badillo Castilleja',

@@ -11,7 +11,7 @@
             <div class="card-body p-5">
                 <!-- Header Section -->
                 <div class="text-center mb-5">
-                    {% if user.is_authenticated and profile and profile.profile_image %}
+                    {% if profile and profile.profile_image %}
                         <img src="{{ profile.profile_image.url }}" 
                              alt="{{ name }}" 
                              class="rounded-circle mb-3 border border-3 border-primary shadow" 
