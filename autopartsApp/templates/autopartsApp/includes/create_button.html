@@ -3,23 +3,23 @@
 {% load static %}
 {% if user.is_authenticated %}
     {% if permission == 'autopartsApp.add_category' and perms.autopartsApp.add_category %}
-        <a href="{{ create_url }}" class="btn btn-primary mb-3">
+        <a href="{% url create_url %}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> {{ label }}
         </a>
     {% elif permission == 'autopartsApp.add_subcategory' and perms.autopartsApp.add_subcategory %}
-        <a href="{{ create_url }}" class="btn btn-primary mb-3">
+        <a href="{% url create_url %}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> {{ label }}
         </a>
     {% elif permission == 'autopartsApp.add_products' and perms.autopartsApp.add_products %}
-        <a href="{{ create_url }}" class="btn btn-primary mb-3">
+        <a href="{% url create_url %}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> {{ label }}
         </a>
     {% elif permission == 'autopartsBannersApp.add_banner' and perms.autopartsBannersApp.add_banner %}
-        <a href="{{ create_url }}" class="btn btn-primary mb-3">
+        <a href="{% url create_url %}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> {{ label }}
         </a>
     {% elif not permission %}
-        <a href="{{ create_url }}" class="btn btn-primary mb-3">
+        <a href="{% url create_url %}" class="btn btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> {{ label }}
         </a>
     {% endif %}
