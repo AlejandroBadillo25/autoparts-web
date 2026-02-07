@@ -12,7 +12,7 @@
     <!-- Banners de Productos -->
     {% include 'autopartsBannersApp/banner_display.html' with banners=banners_productos %}
     
-    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:products_create' label='Crear nuevo producto' %}
+    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:products_create' label='Crear nuevo producto' permission='autopartsApp.add_products' %}
     
     {% include 'autopartsApp/includes/search_bar.html' with search_url='autopartsApp:products' placeholder='Buscar producto...' result_count=products.count %}
 
@@ -29,14 +29,19 @@
                             </div>
                         {% endif %}
                         <div class="card-body position-relative">
-                            {% if user.is_authenticated %}
+                            {% if perms.autopartsApp.view_products or perms.autopartsApp.change_products or perms.autopartsApp.delete_products %}
                                 <div class="position-absolute top-0 end-0 m-2">
+                                    {% if perms.autopartsApp.view_products %}
                                     <a href="{% url 'autopartsApp:products_detail' product.pk %}" class="btn btn-sm btn-info me-1" title="Ver detalle">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {% endif %}
+                                    {% if perms.autopartsApp.change_products %}
                                     <a href="{% url 'autopartsApp:products_edit' product.pk %}" class="btn btn-sm btn-warning me-1" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    {% endif %}
+                                    {% if perms.autopartsApp.delete_products %}
                                     <button type="button" class="btn btn-sm btn-danger" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#deleteModal"
@@ -45,6 +50,7 @@
                                             title="Eliminar">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                             <h5 class="card-title">{{ product.name }}</h5>

@@ -12,7 +12,7 @@
     <!-- Banners de Subcategorías -->
     {% include 'autopartsBannersApp/banner_display.html' with banners=banners_subcategorias %}
     
-    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:subcategory_create' label='Crear nueva subcategoría' %}
+    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:subcategory_create' label='Crear nueva subcategoría' permission='autopartsApp.add_subcategory' %}
     
     {% include 'autopartsApp/includes/search_bar.html' with search_url='autopartsApp:subcategory' placeholder='Buscar subcategoría...' result_count=subcategories.count %}
 
@@ -38,7 +38,7 @@
                                 <small class="text-muted">Creada: {{ subcat.created_at|date:"d/m/Y" }}</small>
                             </div>
                         </div>
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and perms.autopartsApp.change_subcategory %}
                             <div class="btn-group flex-shrink-0" role="group">
                                 <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="btn btn-sm btn-info" title="Ver detalle">
                                     <i class="bi bi-eye"></i> Ver
@@ -46,6 +46,7 @@
                                 <a href="{% url 'autopartsApp:subcategory_edit' subcat.pk %}" class="btn btn-sm btn-warning" title="Editar">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>
+                                {% if perms.autopartsApp.delete_subcategory %}
                                 <button type="button" class="btn btn-sm btn-danger" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#deleteModal"
@@ -54,7 +55,12 @@
                                         title="Eliminar">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
+                                {% endif %}
                             </div>
+                        {% elif user.is_authenticated %}
+                            <a href="{% url 'autopartsApp:subcategory_detail' subcat.pk %}" class="btn btn-sm btn-info" title="Ver detalle">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
                         {% else %}
                             <span class="badge bg-primary rounded-pill flex-shrink-0">{{ subcat.created_at|date:"d/m/Y" }}</span>
                         {% endif %}
