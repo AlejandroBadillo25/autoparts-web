@@ -1,0 +1,21 @@
+{# Template parcial reutilizable para barra de búsqueda #}
+{# Parámetros requeridos: search_url, busqueda (opcional) #}
+<form action="{{ search_url }}" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" 
+               name="busqueda" 
+               value="{{ busqueda }}" 
+               placeholder="{{ placeholder|default:'Buscar...' }}" 
+               class="form-control">
+        <button type="submit" class="btn btn-secondary">Buscar</button>
+        {% if busqueda %}
+            <a href="{{ search_url }}" class="btn btn-outline-secondary">Limpiar</a>
+        {% endif %}
+    </div>
+</form>
+
+{% if busqueda %}
+    <div class="alert alert-info">
+        Mostrando resultados para: <strong>"{{ busqueda }}"</strong> ({{ result_count }} resultado{{ result_count|pluralize }})
+    </div>
+{% endif %}

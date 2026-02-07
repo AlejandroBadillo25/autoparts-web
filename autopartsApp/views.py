@@ -1,193 +1,269 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+)
+from django.urls import reverse_lazy
+from datetime import date
 from .models import Products, Category, Subcategory
 from .forms import CategoryForm, SubcategoryForm, ProductsForm
 
-# Create your views here.
-def home(request):
-    products_list = Products.objects.all().order_by('-created_at')
-    return render(request, 'autopartsApp/index.html', {'products': products_list})
 
-# Category Views
-def category(request):
-    categories = Category.objects.all().order_by('-created_at')
-    busqueda = request.GET.get('busqueda', '')
+# Home View
+class HomeView(ListView):
+    model = Products
+    template_name = 'autopartsApp/index.html'
+    context_object_name = 'products'
+    ordering = ['-created_at']
+
+
+# ==================== CATEGORY VIEWS ====================
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'autopartsApp/category.html'
+    context_object_name = 'categories'
+    ordering = ['-created_at']
     
-    if busqueda:
-        categories = categories.filter(name__icontains=busqueda)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        busqueda = self.request.GET.get('busqueda', '')
+        if busqueda:
+            queryset = queryset.filter(name__icontains=busqueda)
+        return queryset
     
-    return render(request, 'autopartsApp/category.html', {
-        'categories': categories,
-        'busqueda': busqueda
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['busqueda'] = self.request.GET.get('busqueda', '')
+        return context
 
-def category_detail(request, pk):
-    category_obj = get_object_or_404(Category, pk=pk)
-    return render(request, 'autopartsApp/category_detail.html', {'category': category_obj})
 
-@login_required
-def category_create(request):
-    if request.method == 'POST':
-        form = CategoryForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Categoría creada exitosamente.')
-            return redirect('autopartsApp:category')
-    else:
-        form = CategoryForm()
-    return render(request, 'autopartsApp/category_form.html', {'form': form, 'title': 'Crear Categoría'})
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'autopartsApp/category_detail.html'
+    context_object_name = 'category'
 
-@login_required
-def category_edit(request, pk):
-    category_obj = get_object_or_404(Category, pk=pk)
-    if request.method == 'POST':
-        form = CategoryForm(request.POST, request.FILES, instance=category_obj)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Categoría actualizada exitosamente.')
-            return redirect('autopartsApp:category')
-    else:
-        form = CategoryForm(instance=category_obj)
-    return render(request, 'autopartsApp/category_form.html', {'form': form, 'title': 'Editar Categoría'})
 
-@login_required
-def category_delete(request, pk):
-    category_obj = get_object_or_404(Category, pk=pk)
-    if request.method == 'POST':
-        category_obj.delete()
-        messages.success(request, 'Categoría eliminada exitosamente.')
-        return redirect('autopartsApp:category')
-    return render(request, 'autopartsApp/category_confirm_delete.html', {'category': category_obj})
-
-# Subcategory Views
-def subcategory(request):
-    subcategories = Subcategory.objects.all().order_by('-created_at')
-    busqueda = request.GET.get('busqueda', '')
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'autopartsApp/category_form.html'
+    success_url = reverse_lazy('autopartsApp:category')
     
-    if busqueda:
-        subcategories = subcategories.filter(name__icontains=busqueda)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Categoría'
+        return context
     
-    return render(request, 'autopartsApp/subcategory.html', {
-        'subcategories': subcategories,
-        'busqueda': busqueda
-    })
+    def form_valid(self, form):
+        messages.success(self.request, 'Categoría creada exitosamente.')
+        return super().form_valid(form)
 
-def subcategory_detail(request, pk):
-    from datetime import date
-    from autopartsBannersApp.models import Banner
+
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'autopartsApp/category_form.html'
+    success_url = reverse_lazy('autopartsApp:category')
     
-    subcategory_obj = get_object_or_404(Subcategory, pk=pk)
-    today = date.today()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Editar Categoría'
+        return context
     
-    # Obtener banners específicos de esta subcategoría
-    subcategory_banners = Banner.objects.filter(
-        is_active=True,
-        start_date__lte=today,
-        end_date__gte=today,
-        subcategory=subcategory_obj
-    )
+    def form_valid(self, form):
+        messages.success(self.request, 'Categoría actualizada exitosamente.')
+        return super().form_valid(form)
+
+
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Category
+    template_name = 'autopartsApp/category_confirm_delete.html'
+    context_object_name = 'category'
+    success_url = reverse_lazy('autopartsApp:category')
     
-    return render(request, 'autopartsApp/subcategory_detail.html', {
-        'subcategory': subcategory_obj,
-        'subcategory_specific_banners': subcategory_banners
-    })
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Categoría eliminada exitosamente.')
+        return super().delete(request, *args, **kwargs)
 
-@login_required
-def subcategory_create(request):
-    if request.method == 'POST':
-        form = SubcategoryForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Subcategoría creada exitosamente.')
-            return redirect('autopartsApp:subcategory')
-    else:
-        form = SubcategoryForm()
-    return render(request, 'autopartsApp/subcategory_form.html', {'form': form, 'title': 'Crear Subcategoría'})
 
-@login_required
-def subcategory_edit(request, pk):
-    subcategory_obj = get_object_or_404(Subcategory, pk=pk)
-    if request.method == 'POST':
-        form = SubcategoryForm(request.POST, request.FILES, instance=subcategory_obj)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Subcategoría actualizada exitosamente.')
-            return redirect('autopartsApp:subcategory')
-    else:
-        form = SubcategoryForm(instance=subcategory_obj)
-    return render(request, 'autopartsApp/subcategory_form.html', {'form': form, 'title': 'Editar Subcategoría'})
+# ==================== SUBCATEGORY VIEWS ====================
 
-@login_required
-def subcategory_delete(request, pk):
-    subcategory_obj = get_object_or_404(Subcategory, pk=pk)
-    if request.method == 'POST':
-        subcategory_obj.delete()
-        messages.success(request, 'Subcategoría eliminada exitosamente.')
-        return redirect('autopartsApp:subcategory')
-    return render(request, 'autopartsApp/subcategory_confirm_delete.html', {'subcategory': subcategory_obj})
-
-# Products Views
-def products(request):
-    products_list = Products.objects.all().order_by('-created_at')
-    busqueda = request.GET.get('busqueda', '')
+class SubcategoryListView(ListView):
+    model = Subcategory
+    template_name = 'autopartsApp/subcategory.html'
+    context_object_name = 'subcategories'
+    ordering = ['-created_at']
     
-    if busqueda:
-        products_list = products_list.filter(name__icontains=busqueda)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        busqueda = self.request.GET.get('busqueda', '')
+        if busqueda:
+            queryset = queryset.filter(name__icontains=busqueda)
+        return queryset
     
-    return render(request, 'autopartsApp/products.html', {
-        'products': products_list,
-        'busqueda': busqueda
-    })
-
-def products_detail(request, pk):
-    product = get_object_or_404(Products, pk=pk)
-    return render(request, 'autopartsApp/products_detail.html', {'product': product})
-
-@login_required
-def products_create(request):
-    if request.method == 'POST':
-        form = ProductsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto creado exitosamente.')
-            return redirect('autopartsApp:products')
-    else:
-        form = ProductsForm()
-    return render(request, 'autopartsApp/products_form.html', {'form': form, 'title': 'Crear Producto'})
-
-@login_required
-def products_edit(request, pk):
-    product = get_object_or_404(Products, pk=pk)
-    if request.method == 'POST':
-        form = ProductsForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto actualizado exitosamente.')
-            return redirect('autopartsApp:products')
-    else:
-        form = ProductsForm(instance=product)
-    return render(request, 'autopartsApp/products_form.html', {'form': form, 'title': 'Editar Producto'})
-
-@login_required
-def products_delete(request, pk):
-    product = get_object_or_404(Products, pk=pk)
-    if request.method == 'POST':
-        product.delete()
-        messages.success(request, 'Producto eliminado exitosamente.')
-        return redirect('autopartsApp:products')
-    return render(request, 'autopartsApp/products_confirm_delete.html', {'product': product})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['busqueda'] = self.request.GET.get('busqueda', '')
+        return context
 
 
-# About Me / Contact View
+class SubcategoryDetailView(DetailView):
+    model = Subcategory
+    template_name = 'autopartsApp/subcategory_detail.html'
+    context_object_name = 'subcategory'
+    
+    def get_context_data(self, **kwargs):
+        from autopartsBannersApp.models import Banner
+        context = super().get_context_data(**kwargs)
+        today = date.today()
+        
+        # Obtener banners específicos de esta subcategoría
+        subcategory_banners = Banner.objects.filter(
+            is_active=True,
+            start_date__lte=today,
+            end_date__gte=today,
+            subcategory=self.object
+        )
+        context['subcategory_specific_banners'] = subcategory_banners
+        return context
 
-def about_me(request):
-    context = {
-        'name': 'Alejandro Badillo Castilleja',
-        'email': 'kope_alex@hotmail.com',
-        'phone': '8186651164',
-        'location': 'Guadalupe, Nuevo León',
-        'linkedin': 'www.linkedin.com/in/alejandro-badillo25',
-        'github': 'https://github.com/AlejandroBadillo25',
-    }
-    return render(request, 'autopartsApp/about_me.html', context)
+
+class SubcategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Subcategory
+    form_class = SubcategoryForm
+    template_name = 'autopartsApp/subcategory_form.html'
+    success_url = reverse_lazy('autopartsApp:subcategory')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Subcategoría'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Subcategoría creada exitosamente.')
+        return super().form_valid(form)
+
+
+class SubcategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Subcategory
+    form_class = SubcategoryForm
+    template_name = 'autopartsApp/subcategory_form.html'
+    success_url = reverse_lazy('autopartsApp:subcategory')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Editar Subcategoría'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Subcategoría actualizada exitosamente.')
+        return super().form_valid(form)
+
+
+class SubcategoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Subcategory
+    template_name = 'autopartsApp/subcategory_confirm_delete.html'
+    context_object_name = 'subcategory'
+    success_url = reverse_lazy('autopartsApp:subcategory')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Subcategoría eliminada exitosamente.')
+        return super().delete(request, *args, **kwargs)
+
+
+# ==================== PRODUCTS VIEWS ====================
+
+class ProductsListView(ListView):
+    model = Products
+    template_name = 'autopartsApp/products.html'
+    context_object_name = 'products'
+    ordering = ['-created_at']
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        busqueda = self.request.GET.get('busqueda', '')
+        if busqueda:
+            queryset = queryset.filter(name__icontains=busqueda)
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['busqueda'] = self.request.GET.get('busqueda', '')
+        return context
+
+
+class ProductsDetailView(DetailView):
+    model = Products
+    template_name = 'autopartsApp/products_detail.html'
+    context_object_name = 'product'
+
+
+class ProductsCreateView(LoginRequiredMixin, CreateView):
+    model = Products
+    form_class = ProductsForm
+    template_name = 'autopartsApp/products_form.html'
+    success_url = reverse_lazy('autopartsApp:products')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Producto'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Producto creado exitosamente.')
+        return super().form_valid(form)
+
+
+class ProductsUpdateView(LoginRequiredMixin, UpdateView):
+    model = Products
+    form_class = ProductsForm
+    template_name = 'autopartsApp/products_form.html'
+    success_url = reverse_lazy('autopartsApp:products')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Editar Producto'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Producto actualizado exitosamente.')
+        return super().form_valid(form)
+
+
+class ProductsDeleteView(LoginRequiredMixin, DeleteView):
+    model = Products
+    template_name = 'autopartsApp/products_confirm_delete.html'
+    context_object_name = 'product'
+    success_url = reverse_lazy('autopartsApp:products')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Producto eliminado exitosamente.')
+        return super().delete(request, *args, **kwargs)
+
+
+# ==================== ABOUT ME VIEW ====================
+
+class AboutMeView(TemplateView):
+    template_name = 'autopartsApp/about_me.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Obtener perfil del usuario si está autenticado
+        profile = None
+        if self.request.user.is_authenticated:
+            from accountsApp.models import UserProfile
+            profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        
+        context.update({
+            'name': 'Alejandro Badillo Castilleja',
+            'email': 'kope_alex@hotmail.com',
+            'phone': '8186651164',
+            'location': 'Guadalupe, Nuevo León',
+            'linkedin': 'www.linkedin.com/in/alejandro-badillo25',
+            'github': 'https://github.com/AlejandroBadillo25',
+            'profile': profile,
+        })
+        return context

@@ -1,122 +1,385 @@
-# autoparts-web
+# 818 Autopartes - Sistema de Gestión Web
 
-Proyecto desarrollado en Python y Django para administrar la web de una refaccionaria. El sistema permite gestionar categorías, subcategorías y productos de autopartes con funcionalidades completas de creación, listado y búsqueda.
+Sistema web desarrollado con Python y Django para la administración integral de una tienda de autopartes. Implementa arquitectura basada en Class-Based Views (CBV), herencia de templates y gestión de medios con funcionalidades completas de autenticación, autorización y administración de contenido.
 
-## **Descripción**
+## Descripción
 
-Este proyecto incluye:
-- Herencia de templates para mantener una estructura consistente
-- Formularios de creación para categorías, subcategorías y productos
-- Sistema de búsqueda en tiempo real con filtrado
-- Panel de administración de Django
+Plataforma web completa para la gestión de inventario de autopartes que incluye:
+- Sistema de autenticación y perfiles de usuario
+- Gestión de categorías, subcategorías y productos con imágenes
+- Sistema de banners y publicidad segmentado por sección
+- Navegación jerárquica (categorías → subcategorías → productos)
+- Búsqueda y filtrado en tiempo real
+- Panel administrativo con control de permisos
 - Interfaz responsive con Bootstrap 5
-- Base de datos SQLite
+- Arquitectura basada en Class-Based Views
 
-## **Tecnologías utilizadas**
+## Tecnologías Utilizadas
 
+### Backend
 - Python 3.11
-- Django
-- Bootstrap 5
-- SQLite
+- Django 5.2.9
+- Pillow (gestión de imágenes)
+- SQLite (desarrollo)
 
-## **Estructura de datos**
+### Frontend
+- HTML5
+- CSS3
+- Bootstrap 5.3.8
+- Bootstrap Icons 1.11.3
+- JavaScript (ES6+)
 
-El proyecto cuenta con tres modelos principales:
+## Arquitectura del Proyecto
 
-**Category (Categorías)**: Permite organizar los productos en categorías principales (ej. Motor, Frenos, Suspensión).
+### Aplicaciones Django
 
-**Subcategory (Subcategorías)**: Clasificaciones más específicas dentro de cada categoría.
+**autopartsApp**: Gestión del catálogo de productos
+- Categorías, subcategorías y productos
+- Class-Based Views (ListView, DetailView, CreateView, UpdateView, DeleteView)
+- Sistema de búsqueda y filtrado
+- Navegación jerárquica
 
-**Products (Productos)**: Información completa de autopartes incluyendo nombre, descripción, precio, stock y relación con categoría y subcategoría.
+**accountsApp**: Autenticación y gestión de usuarios
+- Login, registro y logout
+- Perfiles de usuario con imagen
+- Cambio de contraseña con AJAX
+- Mixins de autenticación (LoginRequiredMixin)
 
-## **Características principales**
+**autopartsBannersApp**: Sistema de publicidad
+- Gestión de banners por sección (inicio, categorías, subcategorías, productos)
+- Segmentación por categoría/subcategoría específica
+- Control de fechas de vigencia
+- Permisos exclusivos para staff/superuser
+- Mixin personalizado (StaffOrSuperuserRequiredMixin)
 
-- Listado completo de categorías, subcategorías y productos
-- Creación de nuevos registros mediante formularios validados
-- Búsqueda por nombre con filtrado instantáneo
-- Interfaz intuitiva y responsive
-- Panel de administración para gestión avanzada
+### Estructura de Modelos
 
-## **Requisitos previos**
+**Category**
+- Campos: name, description, image, created_at, updated_at
+- Relación: OneToMany con Subcategory
 
-- Python 3.11 o superior instalado
-- Git instalado
+**Subcategory**
+- Campos: name, description, category (FK), image, created_at, updated_at
+- Relación: ManyToOne con Category, OneToMany con Products
 
-## **Pasos para utilizar el proyecto**
+**Products**
+- Campos: name, description, category (FK), subcategory (FK), price, stock, image, created_at, updated_at
+- Relaciones: ManyToOne con Category y Subcategory
 
-**1. Clonar el repositorio de Github**
+**UserProfile**
+- Campos: user (OneToOne), phone, address, profile_image
+- Extensión del modelo User de Django
+
+**Banner**
+- Campos: name, image, section, category (FK opcional), subcategory (FK opcional), start_date, end_date, is_active, order, created_by (FK)
+- Validación de rangos de fechas
+- Segmentación por sección y entidad específica
+
+## Características Principales
+
+### Gestión de Contenido
+- CRUD completo para categorías, subcategorías y productos
+- Carga y visualización de imágenes con placeholders
+- Preview de imágenes antes de subir (FileReader API)
+- Búsqueda en tiempo real con filtrado por nombre
+- Navegación jerárquica mediante enlaces clickeables
+
+### Sistema de Usuarios
+- Autenticación completa (login, registro, logout)
+- Perfiles personalizables con imagen
+- Cambio de contraseña con validación AJAX
+- Control de permisos basado en roles
+
+### Sistema de Banners
+- Gestión exclusiva para staff/superuser
+- Segmentación por sección del sitio
+- Asignación a categorías/subcategorías específicas
+- Control de fechas de inicio y fin
+- Activación/desactivación dinámica
+- Orden de visualización personalizable
+
+### Interfaz de Usuario
+- Herencia de templates mediante base.html
+- Componentes reutilizables (search_bar, create_button, empty_state)
+- Responsive design con Bootstrap 5
+- Mensajes de feedback (Django messages framework)
+- Modales de confirmación para acciones destructivas
+- Efectos hover y transiciones suaves
+
+### Seguridad
+- Protección CSRF en todos los formularios
+- LoginRequiredMixin en vistas que requieren autenticación
+- UserPassesTestMixin para validación de permisos personalizados
+- Validación de formularios en cliente y servidor
+- Control de acceso basado en autenticación para acciones CRUD
+
+## Requisitos Previos
+
+- Python 3.11 o superior
+- pip (gestor de paquetes de Python)
+- Git
+
+## Instalación
+
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/AlejandroBadillo25/autoparts-web.git
-cd autoparts-web
+cd autoparts-web/autoparts-web
 ```
 
-**2. Crear un entorno virtual**
+### 2. Crear y activar entorno virtual
 
-En **macOS/Linux**:
+**macOS/Linux:**
 ```bash
 python -m venv .venv
-```
-
-En **Windows**:
-```bash
-python -m venv .venv
-```
-
-**3. Activar el entorno virtual**
-
-En **macOS/Linux**:
-```bash
 source .venv/bin/activate
 ```
 
-En **Windows (CMD)**:
+**Windows (CMD):**
 ```bash
+python -m venv .venv
 .venv\Scripts\activate.bat
 ```
 
-En **Windows (PowerShell)**:
+**Windows (PowerShell):**
 ```bash
+python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-**4. Instalar las dependencias**
+### 3. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**5. Ejecutar las migraciones**
+### 4. Ejecutar migraciones
 
 ```bash
 python manage.py migrate
 ```
 
-**6. Crear un superusuario (opcional, para acceder al panel de administración)**
+### 5. Crear superusuario
 
 ```bash
 python manage.py createsuperuser
 ```
 
-**7. Ejecutar el servidor de desarrollo**
+### 6. Ejecutar servidor de desarrollo
 
 ```bash
 python manage.py runserver
 ```
 
-**8. Acceder a la aplicación**
+### 7. Acceder a la aplicación
 
-Abrir el navegador en: `http://127.0.0.1:8000/`
+- Aplicación principal: http://127.0.0.1:8000/
+- Panel de administración: http://127.0.0.1:8000/admin/
 
-Panel de administración: `http://127.0.0.1:8000/admin/`
+## Estructura de URLs
 
-## **Rutas principales**
+### autopartsApp
 
-- `/` - Página de inicio con listado de productos
+**Inicio:**
+- `/` - Página principal con productos destacados
+
+**Categorías:**
 - `/category/` - Listado de categorías
-- `/category/create/` - Crear nueva categoría
+- `/category/create/` - Crear categoría (requiere autenticación)
+- `/category/<id>/` - Detalle de categoría con subcategorías
+- `/category/<id>/edit/` - Editar categoría (requiere autenticación)
+- `/category/<id>/delete/` - Eliminar categoría (requiere autenticación)
+
+**Subcategorías:**
 - `/subcategory/` - Listado de subcategorías
-- `/subcategory/create/` - Crear nueva subcategoría
+- `/subcategory/create/` - Crear subcategoría (requiere autenticación)
+- `/subcategory/<id>/` - Detalle de subcategoría con productos y banners específicos
+- `/subcategory/<id>/edit/` - Editar subcategoría (requiere autenticación)
+- `/subcategory/<id>/delete/` - Eliminar subcategoría (requiere autenticación)
+
+**Productos:**
 - `/products/` - Listado de productos
-- `/products/create/` - Crear nuevo producto
+- `/products/create/` - Crear producto (requiere autenticación)
+- `/products/<id>/` - Detalle de producto
+- `/products/<id>/edit/` - Editar producto (requiere autenticación)
+- `/products/<id>/delete/` - Eliminar producto (requiere autenticación)
+
+**Otros:**
+- `/about/` - Página de contacto e información
+
+### accountsApp
+
+- `/accounts/login/` - Inicio de sesión
+- `/accounts/register/` - Registro de usuarios
+- `/accounts/logout/` - Cerrar sesión
+- `/accounts/profile/edit/` - Editar perfil (requiere autenticación)
+- `/accounts/profile/change-password/` - Cambiar contraseña (requiere autenticación)
+
+### autopartsBannersApp
+
+- `/banners/` - Listado de banners (requiere staff/superuser)
+- `/banners/crear/` - Crear banner (requiere staff/superuser)
+- `/banners/editar/<id>/` - Editar banner (requiere staff/superuser)
+- `/banners/eliminar/<id>/` - Eliminar banner (requiere staff/superuser)
+- `/banners/toggle/<id>/` - Activar/desactivar banner (requiere staff/superuser)
+
+## Estructura de Archivos
+
+```
+autoparts-web/
+├── manage.py
+├── requirements.txt
+├── db.sqlite3
+├── media/                          # Archivos subidos
+│   ├── category_images/
+│   ├── subcategory_images/
+│   ├── product_images/
+│   ├── banners/
+│   └── profile_images/
+├── autoparts/                      # Configuración del proyecto
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── autopartsApp/                   # App principal
+│   ├── models.py
+│   ├── views.py                    # Class-Based Views
+│   ├── forms.py
+│   ├── urls.py
+│   └── templates/
+│       └── autopartsApp/
+│           ├── base.html           # Template base con herencia
+│           ├── includes/           # Componentes reutilizables
+│           │   ├── search_bar.html
+│           │   ├── create_button.html
+│           │   └── empty_state.html
+│           ├── index.html
+│           ├── category*.html
+│           ├── subcategory*.html
+│           ├── products*.html
+│           └── about_me.html
+├── accountsApp/                    # Autenticación
+│   ├── models.py
+│   ├── views.py                    # Class-Based Views
+│   ├── forms.py
+│   ├── urls.py
+│   └── templates/
+│       └── accountsApp/
+│           ├── login.html
+│           ├── register.html
+│           └── profile_edit.html
+└── autopartsBannersApp/            # Sistema de banners
+    ├── models.py
+    ├── views.py                    # Class-Based Views con Mixins
+    ├── forms.py
+    ├── urls.py
+    ├── context_processors.py       # Banners globales
+    └── templates/
+        └── autopartsBannersApp/
+            ├── banner_list.html
+            ├── banner_form.html
+            ├── banner_confirm_delete.html
+            └── banner_display.html # Include reutilizable
+```
+
+## Patrones de Diseño Implementados
+
+### Class-Based Views (CBV)
+- **ListView**: Listados con búsqueda y filtrado
+- **DetailView**: Vistas de detalle con contexto adicional
+- **CreateView**: Formularios de creación con validación
+- **UpdateView**: Formularios de edición
+- **DeleteView**: Confirmación de eliminación
+- **FormView**: Formularios personalizados (login, registro, perfil)
+- **TemplateView**: Vistas estáticas (about_me)
+- **View**: Vistas personalizadas (logout, toggle banner)
+
+### Mixins de Django
+- **LoginRequiredMixin**: Requiere autenticación
+- **UserPassesTestMixin**: Validación de permisos personalizada
+- **StaffOrSuperuserRequiredMixin**: Mixin personalizado para staff/superuser
+
+### Template Inheritance
+- Base template (base.html) con bloques extensibles
+- Componentes reutilizables mediante {% include %}
+- Context processors para datos globales (banners)
+
+### DRY (Don't Repeat Yourself)
+- Componentes reutilizables en templates/includes/
+- Formularios ModelForm vinculados a modelos
+- Mixins para lógica compartida entre vistas
+
+## Funcionalidades Avanzadas
+
+### Sistema de Context Processors
+Los banners están disponibles globalmente mediante context processor:
+- `banners_inicio`: Banners para la página principal
+- `banners_categorias`: Banners para categorías
+- `banners_subcategorias`: Banners para subcategorías
+- `banners_productos`: Banners para productos
+
+### Validaciones Personalizadas
+- Rangos de fechas en banners (start_date <= end_date)
+- Validación de imágenes (formatos permitidos)
+- Validación de precios y stock positivos
+
+### AJAX y JavaScript
+- Cambio de contraseña con validación asíncrona
+- Preview de imágenes antes de subir
+- Modal de confirmación para eliminaciones
+
+## Configuración de Medios
+
+```python
+# settings.py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+```
+
+Las imágenes se organizan automáticamente según el tipo:
+- Categorías: `media/category_images/`
+- Subcategorías: `media/subcategory_images/`
+- Productos: `media/product_images/`
+- Banners: `media/banners/`
+- Perfiles: `media/profile_images/`
+
+## Control de Permisos
+
+### Visitantes (No autenticados)
+- Ver categorías, subcategorías y productos
+- Navegar jerárquicamente por el catálogo
+- Ver banners públicos
+
+### Usuarios Autenticados
+- Todo lo anterior
+- Crear, editar y eliminar categorías, subcategorías y productos
+- Editar perfil personal
+- Cambiar contraseña
+
+### Staff/Superuser
+- Todo lo anterior
+- Gestionar banners
+- Acceso al panel de administración de Django
+
+## Desarrollo y Contribución
+
+Este proyecto sigue las mejores prácticas de Django:
+- Arquitectura basada en Class-Based Views
+- Separación de responsabilidades (MTV pattern)
+- Código limpio y documentado
+- Validaciones en cliente y servidor
+- Seguridad CSRF habilitada
+- Gestión de archivos media
+- Mensajes de feedback al usuario
+
+## Autor
+
+Alejandro Badillo Castilleja
+- Email: kope_alex@hotmail.com
+- LinkedIn: [www.linkedin.com/in/alejandro-badillo25](https://www.linkedin.com/in/alejandro-badillo25)
+- GitHub: [github.com/AlejandroBadillo25](https://github.com/AlejandroBadillo25)
+
+## Licencia
+
+Este proyecto es de código abierto y está disponible bajo la licencia correspondiente.
 

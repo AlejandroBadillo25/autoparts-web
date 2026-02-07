@@ -1,12 +1,15 @@
 from django.urls import path
-from . import views
+from .views import (
+    BannerListView, BannerCreateView, BannerUpdateView, 
+    BannerDeleteView, BannerToggleActiveView
+)
 
 app_name = 'autopartsBannersApp'
 
 urlpatterns = [
-    path('', views.banner_list, name='banner_list'),
-    path('crear/', views.banner_create, name='banner_create'),
-    path('editar/<int:pk>/', views.banner_edit, name='banner_edit'),
-    path('eliminar/<int:pk>/', views.banner_delete, name='banner_delete'),
-    path('toggle/<int:pk>/', views.banner_toggle_active, name='banner_toggle_active'),
+    path('', BannerListView.as_view(), name='banner_list'),
+    path('crear/', BannerCreateView.as_view(), name='banner_create'),
+    path('editar/<int:pk>/', BannerUpdateView.as_view(), name='banner_edit'),
+    path('eliminar/<int:pk>/', BannerDeleteView.as_view(), name='banner_delete'),
+    path('toggle/<int:pk>/', BannerToggleActiveView.as_view(), name='banner_toggle_active'),
 ]

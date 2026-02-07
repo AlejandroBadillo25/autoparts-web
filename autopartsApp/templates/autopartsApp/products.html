@@ -12,25 +12,9 @@
     <!-- Banners de Productos -->
     {% include 'autopartsBannersApp/banner_display.html' with banners=banners_productos %}
     
-    {% if user.is_authenticated %}
-        <a href="{% url 'autopartsApp:products_create' %}" class="btn btn-primary mb-3">Crear nuevo producto</a>
-    {% endif %}
+    {% include 'autopartsApp/includes/create_button.html' with create_url='autopartsApp:products_create' label='Crear nuevo producto' %}
     
-    <form action="{% url 'autopartsApp:products' %}" method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar producto..." class="form-control">
-            <button type="submit" class="btn btn-secondary">Buscar</button>
-            {% if busqueda %}
-                <a href="{% url 'autopartsApp:products' %}" class="btn btn-outline-secondary">Limpiar</a>
-            {% endif %}
-        </div>
-    </form>
-
-    {% if busqueda %}
-        <div class="alert alert-info">
-            Mostrando resultados para: <strong>"{{ busqueda }}"</strong> ({{ products.count }} resultado{{ products.count|pluralize }})
-        </div>
-    {% endif %}
+    {% include 'autopartsApp/includes/search_bar.html' with search_url='autopartsApp:products' placeholder='Buscar producto...' result_count=products.count %}
 
     {% if products %}
         <div class="row">
